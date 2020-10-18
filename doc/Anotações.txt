@@ -1,0 +1,17 @@
+Alguns códigos SQL básico
+
+- Criar tabelas
+	-> create table {tabela} ({nomeDoCampo} tipo primary key, {nomeDoCampo} tipo, {nomeDoCampo} tipo, ....);
+
+- Selecionar elementos de uma tabela
+	-> select * from {tabela};    # Seleciona todos os elementos de uma determinada tabela
+	-> select * from {tabela} where {campo} = {valorDesejado};     # Seleciona todos os elementos onde o campo informado é igual ao valor desejado
+
+- Inserir elementos em uma tabela
+	-> insert into {tabela} values ({valor}, {valor}, {valor}, ....);     # Adiciona um elemento na tabela informada, caso o campo seja do tipo serial, é conveniente passar o valor DEFAULT
+
+- Atualizar valores de um elemento em uma tabela
+	-> update {tabela} set {campo} = {novoValor}, {campo} = {novoValor}, .... where {campo} = {valor};     # Atualiza um valor em um campo de um elemento da tabela dada, se o 'where' não for específicado, ele irá atualizar TODOS os elementos da tabela
+
+- Deletar elemento de uma tabela
+	-> delete from {tabela} where {campo} = {valor};     # Deleta um elemento da tabela onde seu campo escolhido tenha o valor dado
