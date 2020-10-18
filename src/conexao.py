@@ -17,12 +17,82 @@ class conectar():
             print("Houve um erro ao criar a conexão.")
             raise
 
+
     def executarSql(self, sql):
-        "Função utilizada para criar tabelas, inserir elementos, atualizar e outros SQLs em geral"
         try:
             self._banco.execute(sql)
         except:
             print("Por favor verifique o SQL informado.")
+            raise
+
+
+    def atualizarElementos(self, nomeDaTabela, novosValores = {}, condicao = ""):
+        "O formato de novosValores deve ser {'campo':'valor'}\nO formato de condicao, caso tenha, deve ser 'campo = valor'"
+
+        sql = "update " + nomeDaTabela + " set "
+
+        for chave in novosValores:
+            sql += chave + " = " + novosValores[chave] + ", "
+
+        sql = sql[:-2]
+
+        if condicao != "":
+            sql += " where " + condicao
+            
+        try:
+            self._banco.execute(sql)
+        except:
+            raise
+
+
+    def deletarElementos(self, nomeDaTabela, condicao = ""):
+        "Deleta um elemento da tabela onde a condição seja verdadeira\nO formato de condicao deve ser 'campo = valor'"
+
+        sql = "delete from " + nomeDaTabela + " where " + condicao
+
+        try:
+            self._banco.execute(sql)
+        except:
+            raise
+
+    
+    def inserirElementos(self, nomeDaTabela, valores = {}):
+        "O formato de valores deve ser {'campo':'valor'}"
+
+        sql = "insert into " + nomeDaTabela + " ("
+
+        # O for abaixo cria a parte das colunas
+        for chave in valores:
+            sql += chave + ", "
+        sql = sql[:-2] + ") values ("
+
+        # O for abaixo cria a parte dos valores
+        for chave in valores:
+            sql += valores[chave] + ", "
+        sql = sql[:-2] + ")"
+
+        try:
+            self._banco.execute(sql)
+        except:
+            raise
+
+
+    def criarTabela(self, nomeDaTabela, chavePrimaria = {}, campos = {}):
+        "Os campos devem ser um dicionário no formato {'nomeDoCampo':'tipo'}\nO conteúdo dos dicionários deve ser uma String"
+
+        for chave in chavePrimaria:
+            sqlCampos = " (" + chave + " " + chavePrimaria[chave] + " primary key, "
+        
+        for chave in campos:
+            sqlCampos += chave + " " + campos[chave] + ", "
+
+        sqlCampos = sqlCampos[:-2] + ")"
+        
+        sql = "create table " + nomeDaTabela + sqlCampos
+        
+        try:
+            self._banco.execute(sql)
+        except:
             raise
 
         
