@@ -26,6 +26,38 @@ class conectar():
             raise
 
 
+    def listarTabelas(self):
+        "Retorna uma lista contendo todas as tabelas do banco de dados conectado"
+        
+        sql = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'"
+
+        listaCrua = self._banco.prepare(sql)
+
+        lista = []
+        for linha in listaCrua:
+            lista.append(linha[0])
+            
+        return lista
+
+
+    def pegarInfosTabela(self, tabela):
+        "Retorna uma lista com os campos da tabela dada, bem como o tipo e tamanho do campo"
+        
+        sql = "SELECT column_name, data_type, character_maximum_length FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tabela + "'"
+
+        listaCrua = self._banco.prepare(sql)
+
+        lista = []
+        for linha in listaCrua:
+            listinha = []
+            listinha.append(linha[0])
+            listinha.append(linha[1])
+            listinha.append(linha[2])
+            lista.append(listinha)
+        
+        return lista
+    
+        
     def atualizarElementos(self, nomeDaTabela, novosValores = {}, condicao = ""):
         "O formato de novosValores deve ser {'campo':'valor'}\nO formato de condicao, caso tenha, deve ser 'campo = valor'"
 
