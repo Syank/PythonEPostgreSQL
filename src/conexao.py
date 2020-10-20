@@ -128,13 +128,15 @@ class conectar():
             raise
 
         
-    def selecionarElementos(self, tabela, condicao = ""):
+    def selecionarElementos(self, tabela, condicao = "", orderBy = ""):
         "Retorna uma lista com os elementos selecionados\nExemplo condicao: 'valor = 1'"
 
         if condicao == "":
             sql = "select * from " + tabela
         else:
             sql = "select * from " + tabela + " where " + condicao
+        if orderBy != "":
+            sql += " order by " + orderBy
         
         try:
             preparacao = self._banco.prepare(sql)
