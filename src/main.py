@@ -1,10 +1,18 @@
 import postgresql
 import conexao
+import pessoa
 
-banco = conexao.conectar("testespy", "admin")
+def registrarPessoa(nome, idade):
+    pessoa.pessoa(nome, idade)
 
-lista = banco.selecionarElementos("cidade")
-for elemento in lista:
-    print(elemento)
-    
-banco.desconectar()
+
+
+registrarPessoa("Rosangela", "37")
+
+
+banco = conexao.conectar()
+
+elementos = banco.selecionarElementos("pessoa")
+
+print(elementos)
+

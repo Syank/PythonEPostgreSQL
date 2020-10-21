@@ -3,9 +3,6 @@ import conexao
 
 class pessoa():
     def __init__(self, nome, idade):
-        """Ao não passar o parâmetro primaryKey, a chave primária da entidade 
-        será um id serial"""
-        
         self.nome = nome
         self.idade = idade
 

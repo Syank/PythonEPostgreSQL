@@ -1,4 +1,6 @@
 import postgresql
+import pessoa
+import carro
 
 class conectar():
     _banco = None
@@ -165,7 +167,7 @@ class conectar():
         except:
             print("Por favor verifique o SQL informado.")
             raise
-    
+
     
     def desconectar(self):
         print("Desconectando do banco...")
