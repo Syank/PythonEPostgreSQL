@@ -3,14 +3,23 @@ import postgresql
 class conectar():
     _banco = None
     
-    def __init__(self, nomeDoBanco, senha, usuario = "postgres"):
-        self.usuario = usuario
-        self.senha = senha
-        self.nomeDoBanco = nomeDoBanco
+    def __init__(self):
+        credenciais = open("configs.txt", encoding = "UTF-8")
+        infos = credenciais.readlines()
+        credenciais.close()
 
+        for linha in infos:
+            if "usuario" in linha:
+                self.usuario = linha[linha.index(' "') + 2:-2]
+            elif "senha" in linha:
+                self.senha = linha[linha.index(' "') + 2:-2]
+            elif "database" in linha:
+                self.nomeDoBanco = linha[linha.index(' "') + 2:-2]
+            else:
+                break
         
         try:
-            self._banco = postgresql.open("pq://" + self.usuario + ":" + self.senha + "@localhost/" + nomeDoBanco)
+            self._banco = postgresql.open("pq://" + self.usuario + ":" + self.senha + "@localhost/" + self.nomeDoBanco)
             print("Conexão bem sucedida com o banco " + self.nomeDoBanco)
 
         except:
@@ -18,9 +27,10 @@ class conectar():
             raise
 
 
-    def executarSql(self, sql):
+    def prepararSql(self, sql):
         try:
-            self._banco.execute(sql)
+            resultado = self._banco.prepare(sql)
+            return resultado
         except:
             print("Por favor verifique o SQL informado.")
             raise
@@ -88,11 +98,12 @@ class conectar():
             raise
 
     
-    def inserirElementos(self, nomeDaTabela, valores = {}):
-        "O formato de valores deve ser {'campo':'valor'}"
+    def inserirElementos(self, nomeDaTabela, valores = {}, retorno = ""):
+        "O formato de valores deve ser {'campo':'valor'}\nAo atribuir um valor ao retorno, a função retornará o valor do campo pedido"
 
         sql = "insert into " + nomeDaTabela + " ("
 
+        
         # O for abaixo cria a parte das colunas
         for chave in valores:
             sql += chave + ", "
@@ -103,11 +114,18 @@ class conectar():
             sql += valores[chave] + ", "
         sql = sql[:-2] + ")"
 
-        try:
-            self._banco.execute(sql)
-        except:
-            raise
-
+        if retorno == "":
+            try:
+                self._banco.execute(sql)
+            except:
+                raise
+        else:
+            sql += " returning " + retorno
+            try:
+                resultado = self._banco.prepare(sql)
+                return resultado
+            except:
+                raise
 
     def criarTabela(self, nomeDaTabela, chavePrimaria = {}, campos = {}):
         "Os campos devem ser um dicionário no formato {'nomeDoCampo':'tipo'}\nO conteúdo dos dicionários deve ser uma String"
