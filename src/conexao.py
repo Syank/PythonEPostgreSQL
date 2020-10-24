@@ -1,14 +1,13 @@
 import postgresql
-import pessoa
-import carro
+
 
 class conectar():
     _banco = None
     
     def __init__(self):
-        credenciais = open("configs.txt", encoding = "UTF-8")
-        infos = credenciais.readlines()
-        credenciais.close()
+        configs = open("configs.txt", encoding = "UTF-8")
+        infos = configs.readlines()
+        configs.close()
 
         for linha in infos:
             if "usuario" in linha:
@@ -41,21 +40,52 @@ class conectar():
     def listarTabelas(self):
         "Retorna uma lista contendo todas as tabelas do banco de dados conectado"
         
-        sql = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'"
+        sql = "select table_name from information_schema.tables where table_schema='public' and table_type='BASE TABLE'"
 
         listaCrua = self._banco.prepare(sql)
 
         lista = []
         for linha in listaCrua:
             lista.append(linha[0])
-            
+
+        print("SQL executado: " + sql)
         return lista
+
+
+    def alterarTabela(self, tabela, novosCampos, operacao = ""):
+        """Operações de add, rename e drop
+        O formato de novosCampos deve ser [['nomeColuna','tipo'], ...] para: add
+        O formato de novosCampos deve ser [['nomeColuna','novoNomeColuna'], ...] para: rename
+        O formato de novosCampos deve ser ['colunaAApagar', ...] para: drop
+        """
+
+        sql = "alter table " + tabela + " "
+
+        if operacao == "add":
+            for coluna in novosCampos:
+                sql += "add column " + coluna[0] + " " + coluna[1] + ", "
+                
+        elif operacao == "rename":
+            for coluna in novosCampos:
+                sql += "rename column " + coluna[0] + " to " + coluna[1] + ", "
+
+        elif operacao == "drop":
+            for coluna in novosCampos:
+                sql += "drop column " + coluna + ", "
+
+        sql = sql[:-2]
+
+        try:
+            self._banco.execute(sql)
+            print("SQL executado: " + sql)
+        except:
+            raise
 
 
     def pegarInfosTabela(self, tabela):
         "Retorna uma lista com os campos da tabela dada, bem como o tipo e tamanho do campo"
         
-        sql = "SELECT column_name, data_type, character_maximum_length FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '" + tabela + "'"
+        sql = "select column_name, data_type, character_maximum_length from INFORMATION_SCHEMA.COLUMNS where table_name = '" + tabela + "'"
 
         listaCrua = self._banco.prepare(sql)
 
@@ -66,7 +96,8 @@ class conectar():
             listinha.append(linha[1])
             listinha.append(linha[2])
             lista.append(listinha)
-        
+
+        print("SQL executado: " + sql)
         return lista
     
         
@@ -84,6 +115,7 @@ class conectar():
             sql += " where " + condicao
             
         try:
+            print("SQL executado: " + sql)
             self._banco.execute(sql)
         except:
             raise
@@ -95,6 +127,7 @@ class conectar():
         sql = "delete from " + nomeDaTabela + " where " + condicao
 
         try:
+            print("SQL executado: " + sql)
             self._banco.execute(sql)
         except:
             raise
@@ -119,12 +152,14 @@ class conectar():
         if retorno == "":
             try:
                 self._banco.execute(sql)
+                print("SQL executado: " + sql)
             except:
                 raise
         else:
             sql += " returning " + retorno
             try:
                 resultado = self._banco.prepare(sql)
+                print("SQL executado: " + sql)
                 return resultado
             except:
                 raise
@@ -144,6 +179,7 @@ class conectar():
         
         try:
             self._banco.execute(sql)
+            print("SQL executado: " + sql)
         except:
             raise
 
@@ -163,6 +199,7 @@ class conectar():
             lista = []
             for linha in preparacao:
                 lista.append(linha)
+            print("SQL executado: " + sql)
             return lista
         except:
             print("Por favor verifique o SQL informado.")

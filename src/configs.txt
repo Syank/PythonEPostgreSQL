@@ -1,4 +1,3 @@
 usuario = "postgres"
 senha = "admin"
 database = "testespy"
-entidade.pessoa = "pessoa"
